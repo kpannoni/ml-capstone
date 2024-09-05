@@ -14,7 +14,9 @@ https://archive.ics.uci.edu/dataset/189/parkinsons+telemonitoring
 
 
 <!-- Insert demographics of age and sex here -->
-![Pie chart of patient sex](/piechart_sex.png) &emsp; ![Pie chart of patient sex](/age_boxplot_updated.png)
+<img src="https://github.com/kpannoni/ml-capstone/blob/main/piechart_sex.png" alt="Pie chart of patient sex" width="200"/> &emsp; <img src="https://github.com/kpannoni/ml-capstone/blob/main/age_boxplot_updated.png" alt="Box plot of patient age" width="450"/>
+<!--
+![Pie chart of patient sex](/age_boxplot_updated.png) -->
   
 **19 features of interest:**
 
@@ -32,9 +34,9 @@ https://archive.ics.uci.edu/dataset/189/parkinsons+telemonitoring
 **Distribution of Patient UPDRS Scores:** <br><br>
 
 <!-- Insert score distribution plots here -->
-![histogram of motor UPDRS score](/dist_motor_score.png)
+<img src="https://github.com/kpannoni/ml-capstone/blob/main/dist_motor_score.png" alt="histogram of motor UPDRS score" width="500"/>
 
-![histogram of total UPDRS score](/dist_total_score.png)
+<img src="https://github.com/kpannoni/ml-capstone/blob/main/dist_total_score.png" alt="histogram of total UPDRS score" width="500"/>
 
 ## Goal
 
@@ -59,7 +61,7 @@ Ultimately, this can be used to remotely and non-invasively monitor progression 
 ## Building a functional API Neural Network <br>
 
 <!-- model schematic here -->
-![Neural network schematic](/neural_network_archit.png)
+<img src="https://github.com/kpannoni/ml-capstone/blob/main/neural_network_archit.png" alt="Neural Network Schematic" width="700"/>
 
 A functional API model was defined containing dense layers, dropout layers, and two output layers. <br>
 Compiled using the "Adam"  Optimizer with a linear activation.
