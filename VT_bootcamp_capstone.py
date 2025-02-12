@@ -108,7 +108,7 @@ def compute_corr(df):
     mask[np.triu_indices_from(mask)] = True
     with sns.axes_style("white"): # set seaborn style
         f, ax = plt.subplots(figsize=(16, 5))
-        ax = sns.heatmap(corr, mask=mask, vmax=1.0, vmin=-1.0, square=False, annot=True, cmap='coolwarm')
+        sns.heatmap(corr, mask=mask, vmax=1.0, vmin=-1.0, square=False, annot=True, cmap='coolwarm')
     plt.savefig('corr.png')
     plt.show()
     
