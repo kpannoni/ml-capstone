@@ -140,9 +140,6 @@ def dist_plot(x, label, bins): # update this later to include color and range as
 dist_plot(y["total_UPDRS"], "Total Score", bins=20)
 
 
-# Maybe later, create a line plot of jitter and motor score and shimmer and motor score to show the correlation
-# Can also plot the relationship between total and motor UPDRS score
-
 #%% Now let's build a functional API neural network
 
 # split the dataset into train and test, 80-20 split
@@ -168,7 +165,7 @@ print(X_test.shape)
 # Create a callback for early stopping to prevent overfitting the model
 callback = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=3)
 
-# Definte the inputs into the model
+# Define the inputs into the model
 input_shape = X_train.shape[1]
 input_layer = layers.Input(shape=(input_shape,))
 
@@ -224,7 +221,7 @@ predict_motor_df = pd.DataFrame({"Predicted":motor_predict[1:11,0].tolist(), "Ac
 # Save as a CSV file
 predict_motor_df.to_csv("predict_motor_df.csv", index=False)
 
-# Get the first 10 predictions ffor the total score
+# Get the first 10 predictions for the total score
 predict_total_df = pd.DataFrame({"Predicted":total_predict[1:11,0].tolist(), "Actual":list(y2_test[1:11])})
 predict_total_df.to_csv("predict_total_df.csv", index=False)
 
