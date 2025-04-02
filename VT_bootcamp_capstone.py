@@ -40,6 +40,8 @@ import warnings
 warnings.filterwarnings("ignore")
 from ucimlrepo import fetch_ucirepo 
   
+print("\nFetching the data...\n")
+
 # Fetch dataset 
 parkinsons_telemonitoring = fetch_ucirepo(id=189) 
   
@@ -57,8 +59,10 @@ var = parkinsons_telemonitoring.variables
 y.describe()
 var_stats = X.describe()
 
+print("Patient Demographics:\n")
+
 # Subject demographics
-print("Average Age of the patients is: ", int(round(var_stats.loc["mean","age"],0)))
+print("Average Age: ", int(round(var_stats.loc["mean","age"],0)))
 
 # Make a boxplot to show the age distribution
 sns.set(rc={'figure.figsize':(8,1.5)})
@@ -73,6 +77,8 @@ plt.xticks(np.arange(30,95,5));
 # how many males and females?
 sex_count = X["sex"].value_counts()
 
+print("\nSex Distribution:\n", sex_count[0], " males\n", sex_count[1], " females")
+
 # create a pie chart for sex
 labels = ["Males","Females"]
 colors_sex = [sns.color_palette('pastel')[0],sns.color_palette('pastel')[3]]
@@ -81,19 +87,54 @@ colors_sex = [sns.color_palette('pastel')[0],sns.color_palette('pastel')[3]]
 fig, ax = plt.subplots()
 plt.pie(x = sex_count, labels = labels, autopct='%1.0f%%', colors=colors_sex, textprops={'size': 'xx-large', 'weight':"bold"}, radius=2.5)
 
+print("\nUnified Parkinson's Disease Rating Scores\n")
+
 # Take a look at the UPDRS score distributions
-sns.set(rc={'figure.figsize':(8,3)})
+sns.set(rc={'figure.figsize':(8,4)})
 fig, axes = plt.subplots(2,1)
 fig.tight_layout()
+plt.subplots_adjust(wspace=0.6, hspace=0.6)
 motor = sns.boxplot(x='motor_UPDRS', data=y, color=sns.color_palette('pastel')[3], ax = axes[0],linecolor="0.3", linewidth=3)
 total = sns.boxplot(x='total_UPDRS', data=y, color=sns.color_palette('pastel')[4], ax = axes[1], linecolor="0.3", linewidth=3)
 
-motor.set(title='UPDRS Severity Score', xlabel = "Motor Score", xlim=(0,108))
-total.set(xlabel = "Total Score", xlim=(0,176))
+motor.set(title='UPDRS Motor Score', xlabel = None, xlim=(0,108))
+total.set(title='UPDRS Total Score', xlabel = None, xlim=(0,176))
 axes[0].tick_params(labelsize=14)
 axes[1].tick_params(labelsize=14)
 
+# Create a function for distribution plot that can be used to look at the distribution of any of the metrics
+
+# Colors for the distribution plots
+color_total = sns.color_palette('pastel')[4]
+color_motor = sns.color_palette('pastel')[1]
+
+range_total = [0, 20,40,60,80,100,120, 140, 160, 179]
+range_motor = [0, 20,40,60,80,100,108]
+
+def dist_plot(x, label, bins, color, x_range): 
+    fig, ax = plt.subplots(figsize=(10, 5))
+    plt.style.use('fivethirtyeight')
+    sns.set_style("whitegrid")
+    # Create the plot
+    sns.distplot(x, bins=bins, color=color)
+    title = "Distribution of " + label # set plot title
+    plt.title(title, fontdict={'fontname': 'Monospace', 'fontsize': 28, 'fontweight': 'bold'})
+    # Set X and Y axis labels
+    plt.xlabel(label, fontdict={'fontname': 'Monospace', 'fontsize': 24,'fontweight':'bold'})
+    plt.ylabel('Frequency', fontdict={'fontname': 'Monospace', 'fontsize': 24, 'fontweight':'bold'})
+    plt.tick_params(labelsize=22)
+    ax.set_xticks(x_range) 
+    plt.show()
+    
+# Create a dist plot for motor score and total score
+
+motor_score = dist_plot(y["motor_UPDRS"], "Motor Score", bins=20, color=color_motor, x_range=range_motor)
+
+total_score = dist_plot(y["total_UPDRS"], "Total Score", bins=20, color=color_total, x_range=range_total)
+
 # Look at correlations in the dataset
+
+print("\nPloting a correlation matrix...")
 
 # Subset just the metrics of interest to correlate
 # Age, jitter, shimmer, NHR, HNR, DFA, PPE, RPDE, motor score, total score
@@ -115,32 +156,10 @@ def compute_corr(df):
 # Use the compute_corr() function on the correlation dataframe
 compute_corr(corr_df)
 
-# Create a function for distribution plot that can be used to look at the distribution of any of the metrics
-
-def dist_plot(x, label, bins): # update this later to include color and range as input
-    fig, ax = plt.subplots(figsize=(10, 5))
-    plt.style.use('fivethirtyeight')
-    sns.set_style("whitegrid")
-    # Create the plot
-    sns.distplot(x, bins=bins, color=sns.color_palette('pastel')[6]) # color for total score
-    title = "Distribution of " + label # set plot title
-    plt.title(title, fontdict={'fontname': 'Monospace', 'fontsize': 28, 'fontweight': 'bold'})
-    # Set X and Y axis labels
-    plt.xlabel(label, fontdict={'fontname': 'Monospace', 'fontsize': 24,'fontweight':'bold'})
-    plt.ylabel('Frequency', fontdict={'fontname': 'Monospace', 'fontsize': 24, 'fontweight':'bold'})
-    plt.tick_params(labelsize=22)
-    ax.set_xticks([0, 20,40,60,80,100,120, 140, 160, 179]) # range for total score
-    # For motor score, range should be: []
-    plt.show()
-    
-# Create a dist plot for motor score and total score
-
-# dist_plot(y["motor_UPDRS"], "Motor Score", bins=20)
-
-dist_plot(y["total_UPDRS"], "Total Score", bins=20)
-
 
 #%% Now let's build a functional API neural network
+
+print("\nBuilding a functional API network...\n")
 
 # split the dataset into train and test, 80-20 split
 
@@ -154,12 +173,16 @@ y1 = np.array(y["motor_UPDRS"])
 y2 = np.array(y["total_UPDRS"])
 
 # Define train and test datasets with an 80-20 split
+test_split = 0.2
 X_train, X_test, y1_train, y1_test, y2_train, y2_test = train_test_split(
-    scaled_X, y1, y2, test_size=0.2, random_state=42 )
+    scaled_X, y1, y2, test_size=test_split, random_state=42 )
 
 # Check the shape of the train and test datasets
-print(X_train.shape)
-print(X_test.shape)
+print(f"Training-Test Split {round((1-test_split)*100)}:{round(test_split*100)}")
+print("Training dataset:", X_train.shape)
+print("Test dataset:", X_test.shape)
+
+print("\nDefining the model architecture...")
 
 # Define the model architecture using functional API
 # Create a callback for early stopping to prevent overfitting the model
@@ -185,29 +208,48 @@ out2 = layers.Dense(1, activation='linear', name='out2')(dropout3)
 # Create the keras model with the input and output layers
 model = tf.keras.Model(inputs=input_layer, outputs=[out1, out2])
 
+print("\nCompiling the model with 'Adam' optimizer...")
+
 # Compile the model with the output names
-# Since our targets are continuous variables, we want Mean Squared Error (MSE) and Mean Absolute Error (MAE) to be our output metrics instead of accuracy
+# Since our targets are continuous, we want Mean Squared Error (MSE) and Mean Absolute Error (MAE) to be our output metrics
 model.compile(optimizer='adam', 
               loss={'out1': 'mean_squared_error', 'out2': 'mean_squared_error'},
               metrics={'out1': 'mae', 'out2': 'mae'})
 
-# Fit the model with the training data for motor score and total score
-history = model.fit(X_train, {'out1': y1_train, 'out2': y2_train}, epochs=10, callbacks=[callback], validation_data=(X_test, {'out1': y1_test, 'out2': y2_test}))
+# Define how many epochs
+epochs=10
 
-# Plot the model's loss over time for each epoch during the training
-    
+print(f"\nTraining the model with {epochs} epochs...\n")
+
+# Fit the model with the training data for motor score and total score
+history = model.fit(X_train, {'out1': y1_train, 'out2': y2_train}, epochs=epochs, callbacks=[callback], validation_data=(X_test, {'out1': y1_test, 'out2': y2_test}))
+
+print("\n...done.")
+
+#%%% Evaluate the model's performance
+
+print("\nPlotting training and validation loss curves...\n")
+
 # summarize history for loss
 plt.plot(history.history['loss'])
 plt.plot(history.history['val_loss'])
 plt.title('model loss')
-plt.ylabel('loss')
+plt.ylabel('Mean Squared Error (combined)')
 plt.xlabel('epoch')
 plt.legend(['train', 'test'], loc='upper right')
 plt.xlim(0,9)
 plt.show()
 
+print("Let's evaluate the model on the test dataset!\n")
+
 # Evaluate model performance
 evaluation_results = model.evaluate(X_test, [y1_test, y2_test])
+
+print("\nModel Performance\nCombined Model Loss (MSE):", round(evaluation_results[1],1))
+print("\nMotor UPDRS\n MAE:", round(evaluation_results[3],1))
+print("Total UPDRS\n MAE:", round(evaluation_results[4],1))
+
+print("\nGetting the model predictions...\n")
 
 # Get the model predictions
 predict = model.predict(X_test)
@@ -216,27 +258,53 @@ predict = model.predict(X_test)
 motor_predict = predict[0]
 total_predict = predict[1]
 
-# Get the first 10 predictions for the motor score
-predict_motor_df = pd.DataFrame({"Predicted":motor_predict[1:11,0].tolist(), "Actual":list(y1_test[1:11])})
-# Save as a CSV file
-predict_motor_df.to_csv("predict_motor_df.csv", index=False)
+# Create a dataframe with the predicted vs actual values
 
-# Get the first 10 predictions for the total score
-predict_total_df = pd.DataFrame({"Predicted":total_predict[1:11,0].tolist(), "Actual":list(y2_test[1:11])})
-predict_total_df.to_csv("predict_total_df.csv", index=False)
+print("\nSaving the predicted and actual scores to CSV files...")
 
-# Print the predictions to the console
-print("\nMotor Score:\n", predict_motor_df)
-print("\nTotal Score:\n", predict_total_df)
+# Predicted and actual motor UPDRS
+predict_motor_df = pd.DataFrame({"Predicted":motor_predict.flatten(), "Actual":list(y1_test)})
+predict_motor_df.to_csv("motor_UPDRS_predictions.csv", index=False)
 
-''' Results:
+# Predicted and actual total UPDRS
+predict_total_df = pd.DataFrame({"Predicted":total_predict.flatten(), "Actual":list(y2_test)})
+predict_total_df.to_csv("total_UPDRS_predictions.csv", index=False)
+
+print("\nPlotting the actual scores vs predicted scores...")
+
+# Function to plot the actual values vs the predicted values for both targets
+def predictions_plot(predict, actual, color, label, max_score): 
+    fig, ax = plt.subplots(figsize=(8, 8))
+    # Create the plot
+    sns.scatterplot(x=actual, y=predict, color = color)
+    title = "Predicted vs Actual " + label    # set plot title
+    plt.title(title, y=1.05, fontdict={'fontname': 'Monospace', 'fontsize': 28, 'fontweight':   'bold'})
+    # Set X and Y axis labels
+    plt.xlabel("Actual Score", fontdict={'fontname': 'Monospace', 'fontsize':        24,'fontweight':'bold'})
+    plt.ylabel('Predicted Score', fontdict={'fontname': 'Monospace', 'fontsize': 24, 'fontweight':'bold'})
+    plt.tick_params(labelsize=22)
+    ax.set_xlim(0,max_score) 
+    ax.set_ylim(0,max_score)
+    # plot the unity line
+    unity_line = np.linspace(0, max_score, 100)
+    plt.plot(unity_line, unity_line, '--', color='gray')
+    plt.show()
     
-    loss: 114.2555 - out1_loss: 41.1237 - out2_loss: 73.1319 - out1_mae: 5.1513 - out2_mae: 6.7543 - val_loss: 97.2990 - val_out1_loss: 34.9647 - val_out2_loss: 62.3343 - val_out1_mae: 4.7239 - val_out2_mae: 6.1343
-    
-    '''
+# Plot the predictions for motor score first
+predictions_plot(predict= predict_motor_df["Predicted"], actual=predict_motor_df["Actual"], color=color_motor, label="Motor UPDRS", max_score=40)
 
+# Now plot the predictions for total score
+predictions_plot(predict= predict_total_df["Predicted"], actual=predict_total_df["Actual"], color=color_total, label="Total UPDRS", max_score=50)
 
+# Show the first 10 predictions as an example
 
+print("\nFirst 10 predictions:")
+
+# Print the first 10 predictions to the console
+print("\nMotor Score:\n", predict_motor_df[0:9])
+print("\nTotal Score:\n", predict_total_df[0:9])
+
+print("\nCode is complete!")
 
 
 
