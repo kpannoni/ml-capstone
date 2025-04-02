@@ -238,6 +238,7 @@ plt.ylabel('Mean Squared Error (combined)')
 plt.xlabel('epoch')
 plt.legend(['train', 'test'], loc='upper right')
 plt.xlim(0,9)
+plt.savefig("train_val_loss_curves.png")
 plt.show()
 
 print("Let's evaluate the model on the test dataset!\n")
@@ -289,12 +290,17 @@ def predictions_plot(predict, actual, color, label, max_score):
     unity_line = np.linspace(0, max_score, 100)
     plt.plot(unity_line, unity_line, '--', color='gray')
     plt.show()
+    return fig
     
 # Plot the predictions for motor score first
-predictions_plot(predict= predict_motor_df["Predicted"], actual=predict_motor_df["Actual"], color=color_motor, label="Motor UPDRS", max_score=40)
+motor_pred_plot = predictions_plot(predict= predict_motor_df["Predicted"], actual=predict_motor_df["Actual"], color=color_motor, label="Motor UPDRS", max_score=40)
+
+motor_pred_plot.savefig("Predicted_vs_actual_motor_UPDRS.png")
 
 # Now plot the predictions for total score
-predictions_plot(predict= predict_total_df["Predicted"], actual=predict_total_df["Actual"], color=color_total, label="Total UPDRS", max_score=50)
+total_pred_plot = predictions_plot(predict= predict_total_df["Predicted"], actual=predict_total_df["Actual"], color=color_total, label="Total UPDRS", max_score=50)
+
+total_pred_plot.savefig("Predicted_vs_actual_total_UPDRS.png")
 
 # Show the first 10 predictions as an example
 
