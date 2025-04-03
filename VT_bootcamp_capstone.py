@@ -31,11 +31,12 @@ import numpy as np
 import seaborn as sns
 import pandas as pd
 import matplotlib.pyplot as plt
+import math
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import tensorflow as tf
+from tensorflow.keras import regularizers
 layers = tf.keras.layers
-
 import warnings
 warnings.filterwarnings("ignore")
 from ucimlrepo import fetch_ucirepo 
@@ -192,18 +193,20 @@ callback = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=3)
 input_shape = X_train.shape[1]
 input_layer = layers.Input(shape=(input_shape,))
 
+# Going to add L2 regularization to the layers
+# Define the lambda here. Very small seems to work best.
+l2_lambda = 0.0001
+
 # Define the rest of the layers of the network
-dense1 = layers.Dense(64, activation='relu')(input_layer)
-dropout1 = layers.Dropout(0.2)(dense1)
-dense2 = layers.Dense(120, activation='relu')(dropout1)
-dropout2 = layers.Dropout(0.2)(dense2)
-dense3 = layers.Dense(240, activation='relu')(dropout2)
-dropout3 = layers.Dropout(0.2)(dense3)
+# Originally had dropout layers with a rate of 0.2, but they were actually making the model performance a little worse
+dense1 = layers.Dense(64, activation='relu', kernel_regularizer=regularizers.l2(l2_lambda))(input_layer)
+dense2 = layers.Dense(240, activation='relu', kernel_regularizer=regularizers.l2(l2_lambda))(dense1)
+dense3 = layers.Dense(240, activation='relu', kernel_regularizer=regularizers.l2(l2_lambda))(dense2)
 
 # output layer 1 for motor score
-out1 = layers.Dense(1, activation='linear', name='out1')(dropout3)
+out1 = layers.Dense(1, activation='linear', name='out1')(dense3)
 # output layer 2 for total score
-out2 = layers.Dense(1, activation='linear', name='out2')(dropout3)
+out2 = layers.Dense(1, activation='linear', name='out2')(dense3)
 
 # Create the keras model with the input and output layers
 model = tf.keras.Model(inputs=input_layer, outputs=[out1, out2])
@@ -213,16 +216,17 @@ print("\nCompiling the model with 'Adam' optimizer...")
 # Compile the model with the output names
 # Since our targets are continuous, we want Mean Squared Error (MSE) and Mean Absolute Error (MAE) to be our output metrics
 model.compile(optimizer='adam', 
-              loss={'out1': 'mean_squared_error', 'out2': 'mean_squared_error'},
-              metrics={'out1': 'mae', 'out2': 'mae'})
+              loss={'out1': 'mean_squared_error', 'out2': 'mean_squared_error'})
 
 # Define how many epochs
-epochs=10
+epochs = 30
+# Define the batch size
+batch = 32
 
-print(f"\nTraining the model with {epochs} epochs...\n")
+print(f"\nTraining the model with {epochs} epochs and a batch size of {batch}...\n")
 
 # Fit the model with the training data for motor score and total score
-history = model.fit(X_train, {'out1': y1_train, 'out2': y2_train}, epochs=epochs, callbacks=[callback], validation_data=(X_test, {'out1': y1_test, 'out2': y2_test}))
+history = model.fit(X_train, {'out1': y1_train, 'out2': y2_train}, epochs=epochs, batch_size=batch, callbacks=[callback], validation_data=(X_test, {'out1': y1_test, 'out2': y2_test}))
 
 print("\n...done.")
 
@@ -237,7 +241,8 @@ plt.title('model loss')
 plt.ylabel('Mean Squared Error (combined)')
 plt.xlabel('epoch')
 plt.legend(['train', 'test'], loc='upper right')
-plt.xlim(0,9)
+plt.xlim(0,epochs-1)
+plt.xticks(np.arange(0,epochs-1,1))
 plt.savefig("train_val_loss_curves.png")
 plt.show()
 
@@ -246,9 +251,46 @@ print("Let's evaluate the model on the test dataset!\n")
 # Evaluate model performance
 evaluation_results = model.evaluate(X_test, [y1_test, y2_test])
 
-print("\nModel Performance\nCombined Model Loss (MSE):", round(evaluation_results[1],1))
-print("\nMotor UPDRS\n MAE:", round(evaluation_results[3],1))
-print("Total UPDRS\n MAE:", round(evaluation_results[4],1))
+# For both motor and total score, calculate the Root Mean Squared Error to put the error back in the same units as the data
+
+print("Calculating the Root Mean Squared Error and normalizing to the range of the data...")
+
+# Parse the evaluation results and calculate RMSE
+combined_loss = round(evaluation_results[0], 1)
+
+motor_MSE = round(evaluation_results[1],2)
+motor_RMSE = round(math.sqrt(motor_MSE),2)
+
+total_MSE = round(evaluation_results[2],2)
+total_RMSE = round(math.sqrt(total_MSE), 2)
+
+# Now for even more information, let's normalize the RMSE by the range to show the error relative to the possible range
+
+# Get the ranges from the full dataset
+range_motor =  max(y1) - min(y1)
+range_total =  max(y2) - min(y2)
+
+# Normalize the RMSE by the range
+norm_RMSE_motor = round(motor_RMSE / range_motor, 3)
+norm_RMSE_total = round(total_RMSE / range_total, 3)
+
+# Get the error as a percent of the range (norm RMSE as %)
+motor_percent_error = norm_RMSE_motor * 100
+total_percent_error = norm_RMSE_total * 100
+
+# Create a summary dataframe with the results
+
+val_results_df = pd.DataFrame({"Motor Score": [motor_MSE, motor_RMSE, motor_percent_error], "Total Score": [total_MSE, total_RMSE, total_percent_error]}, index=["Mean Squared Error", "Root Mean Squared Error", "% error (of the range)"])
+
+# Save the dataframe as a CSV file
+val_results_df.to_csv("model_loss_results.csv")
+
+# Now print the model performance summary to the console
+
+print("\nModel Performance\nCombined Model Loss (MSE):", round(evaluation_results[0],1))
+print(val_results_df)
+print(f"\nPercent error of the model: \n(normalized by the full range of scores)\n {motor_percent_error}% for Motor Score\n {total_percent_error}% for Total Score")
+
 
 print("\nGetting the model predictions...\n")
 
