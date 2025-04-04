@@ -50,7 +50,7 @@ Ultimately, this can be used to remotely and non-invasively monitor progression 
 2. Look at correlations in the data with a corrleation plot
 
 <!--Insert correlation plot here -->
-![Feature correlation plot](/feature_correlation_plot.png)
+<img src="https://github.com/kpannoni/ml-capstone/blob/main/feature_correlation_plot.png" alt="Predicted Scores Motor UPDRS" width="700"/>
 
     * Many vocal metrics are correlated together
     * Total score and motor score are 95% correlated together
@@ -61,10 +61,9 @@ Ultimately, this can be used to remotely and non-invasively monitor progression 
 ## Building a functional API Neural Network <br>
 
 <!-- model schematic here -->
-<img src="https://github.com/kpannoni/ml-capstone/blob/main/updated_NN_architecture.png" alt="Neural Network Schematic" width="600"/>
+<img src="https://github.com/kpannoni/ml-capstone/blob/main/updated_NN_architecture.png" alt="Neural Network Schematic" width="350"/>
 
-A functional API model was defined containing three densely connected layers with ReLu activation and L2 regularization (λ = 0.001), and two output layers with linear activation. <br>
-Compiled using the "Adam"  Optimizer.
+A functional API model was defined containing three densely connected layers with ReLu activation and L2 regularization (λ = 0.001), and two output layers with linear activation. Compiled using the "Adam"  Optimizer.
 
 ## Training the Model
 
@@ -72,11 +71,12 @@ Model was trained on 19 features to predict 2 targets.
 
 **Training split:** <br>_80% training - 20% testing_
 
+**Parameters**
     * Epochs = 30
     * Batch Size = 32
     * Callbacks = Early Stopping
 
-<img src="https://github.com/kpannoni/ml-capstone/blob/main/train_val_loss_curves.png" alt="Training and Validation Loss Curves" width="450"/>
+<img src="https://github.com/kpannoni/ml-capstone/blob/main/train_val_loss_curves.png" alt="Training and Validation Loss Curves" width="550"/>
 
 ## Model Validation
 
@@ -90,7 +90,7 @@ Combined model loss (MSE): 40.8
 | Motor Score   | 14.5 |  3.8   |   0.110     |
 | Total Score   | 26.3 |  5.1   |   0.107     |
 
-Calculated the Root Mean Squared Error and normalized to the range of possible scores in the dataset for each target.
+Calculated the Root Mean Squared Error and normalized to the range of scores in the dataset for each target.
 
 **Percent Error of the model:**
  - 11% for Motor Score
@@ -98,9 +98,9 @@ Calculated the Root Mean Squared Error and normalized to the range of possible s
 
 ### Model Predictions
 
-<img src="https://github.com/kpannoni/ml-capstone/blob/main/Predicted_vs_actual_motor_UPDRS.png" alt="Predicted Scores Motor UPDRS" width="450"/>
+<img src="https://github.com/kpannoni/ml-capstone/blob/main/Predicted_vs_actual_motor_UPDRS.png" alt="Predicted Scores Motor UPDRS" width="400"/>
 
-<img src="https://github.com/kpannoni/ml-capstone/blob/main/Predicted_vs_actual_total_UPDRS.png" alt="Predicted Scores Motor UPDRS" width="450"/>
+<img src="https://github.com/kpannoni/ml-capstone/blob/main/Predicted_vs_actual_total_UPDRS.png" alt="Predicted Scores Motor UPDRS" width="400"/>
 
 ### Motor Score Model Predictions (first 10):
 | Actual Score | Predicted |
