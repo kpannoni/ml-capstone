@@ -318,6 +318,7 @@ print("\nPlotting the actual scores vs predicted scores...")
 # Function to plot the actual values vs the predicted values for both targets
 def predictions_plot(predict, actual, color, label, max_score): 
     fig, ax = plt.subplots(figsize=(8, 8))
+    fig.tight_layout(pad=8)
     # Create the plot
     sns.scatterplot(x=actual, y=predict, color = color)
     title = "Predicted vs Actual " + label    # set plot title
