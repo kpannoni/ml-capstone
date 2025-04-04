@@ -14,7 +14,7 @@ https://archive.ics.uci.edu/dataset/189/parkinsons+telemonitoring
 
 
 <!-- Insert demographics of age and sex here -->
-<img src="https://github.com/kpannoni/ml-capstone/blob/main/piechart_sex.png" alt="Pie chart of patient sex" width="200"/> &emsp; <img src="https://github.com/kpannoni/ml-capstone/blob/main/age_boxplot_updated.png" alt="Box plot of patient age" width="450"/>
+<img src="https://github.com/kpannoni/ml-capstone/blob/main/piechart_sex.png" alt="Pie chart of patient sex" width="200"/> &emsp; <img src="https://github.com/kpannoni/ml-capstone/blob/main/age_boxplot_updated.png" alt="Box plot of patient age" width="400"/>
 <!--
 ![Pie chart of patient sex](/age_boxplot_updated.png) -->
   
@@ -34,9 +34,9 @@ https://archive.ics.uci.edu/dataset/189/parkinsons+telemonitoring
 **Distribution of Patient UPDRS Scores:** <br><br>
 
 <!-- Insert score distribution plots here -->
-<img src="https://github.com/kpannoni/ml-capstone/blob/main/dist_motor_score.png" alt="histogram of motor UPDRS score" width="500"/>
+<img src="https://github.com/kpannoni/ml-capstone/blob/main/dist_motor_score.png" alt="histogram of motor UPDRS score" width="450"/>
 
-<img src="https://github.com/kpannoni/ml-capstone/blob/main/dist_total_score.png" alt="histogram of total UPDRS score" width="500"/>
+<img src="https://github.com/kpannoni/ml-capstone/blob/main/dist_total_score.png" alt="histogram of total UPDRS score" width="450"/>
 
 ## Goal
 
@@ -61,10 +61,10 @@ Ultimately, this can be used to remotely and non-invasively monitor progression 
 ## Building a functional API Neural Network <br>
 
 <!-- model schematic here -->
-<img src="https://github.com/kpannoni/ml-capstone/blob/main/neural_network_archit.png" alt="Neural Network Schematic" width="700"/>
+<img src="https://github.com/kpannoni/ml-capstone/blob/main/updated_NN_architecture.png" alt="Neural Network Schematic" width="600"/>
 
-A functional API model was defined containing dense layers, dropout layers, and two output layers. <br>
-Compiled using the "Adam"  Optimizer with a linear activation.
+A functional API model was defined containing three densely connected layers with ReLu activation and L2 regularization (λ = 0.001), and two output layers with linear activation. <br>
+Compiled using the "Adam"  Optimizer.
 
 ## Training the Model
 
@@ -72,57 +72,67 @@ Model was trained on 19 features to predict 2 targets.
 
 **Training split:** <br>_80% training - 20% testing_
 
-<!-- Consider putting the model loss plot here -->
+    * Epochs = 30
+    * Batch Size = 32
+    * Callbacks = Early Stopping
+
+<img src="https://github.com/kpannoni/ml-capstone/blob/main/train_val_loss_curves.png" alt="Training and Validation Loss Curves" width="450"/>
 
 ## Model Validation
 
-**Assessing model performance with the Mean Absolute Error (MAE):**
+**Assessing model performance with the Mean Squared Error (MSE):**
 
-### Training
-| Target        | Loss |  MAE  |
-| ------------- |:----:| :----:|
-| Motor Score   | 40.1 |  5.2  |
-| Total Score   | 73.1 |  6.8  |
+Combined model loss (MSE): 40.8
 
-### Validation
-| Target        | Loss  | MAE   |
-| ------------- |:-----:| :----:|
-| Motor Score   | 35.0  |  4.7  |
-| Total Score   | 62.3  |  6.1  |
+### Metrics for Model Evaluation
+| Target        | Loss |  RMSE  | Norm RMSE   |
+| ------------- |:----:|:------:|:-----------:|
+| Motor Score   | 14.5 |  3.8   |   0.110     |
+| Total Score   | 26.3 |  5.1   |   0.107     |
+
+Calculated the Root Mean Squared Error and normalized to the range of possible scores in the dataset for each target.
+
+**Percent Error of the model:**
+ - 11% for Motor Score
+ - 10.7% for Total Score
 
 ### Model Predictions
+
+<img src="https://github.com/kpannoni/ml-capstone/blob/main/Predicted_vs_actual_motor_UPDRS.png" alt="Predicted Scores Motor UPDRS" width="450"/>
+
+<img src="https://github.com/kpannoni/ml-capstone/blob/main/Predicted_vs_actual_total_UPDRS.png" alt="Predicted Scores Motor UPDRS" width="450"/>
 
 ### Motor Score Model Predictions (first 10):
 | Actual Score | Predicted |
 | :----------: |:---------:|
-|    7.2       |    6.1    |
-|    11.2      |    11.3   |
-|    12.8      |    13.9   |
-|    25.4      |    20.8   |
-|    18.0      |    18.6   |
-|    11.5      |    14.3   |
-|    25.2      |    23.9   |
-|    17.9      |    15.1   |
-|    28.1      |    15.8   |
-|    16.1      |    18.1   |
+|    25.6      |    33.1   |
+|     5.9      |    7.2    |
+|    14.4      |    11.2   |
+|    12.5      |    12.8   |
+|    23.2      |    25.4   |
+|    22.7      |    19     |
+|    31        |    25.2   |
+|    14.9      |    17.9   |
+|    24.7      |    28.1   |
+|    15        |    16.1   |
 
 ### Total Score Model Predictions (first 10):
 | Actual Score | Predicted |
 | :----------: |:---------:|
-|    12.1      |    8.8    |
-|    14.1      |    15.7   |
-|    16.5      |    20     |
-|    32        |    27.8   |
-|    27        |    25.7   |
-|    17.5      |    20.9   |
-|    45.8      |    34     |
-|    25.4      |    22.1   |
-|    37.5      |    21.6   |
-|    21.5      |    24.4   |
+|    34.5      |    43.7   |
+|    9.6       |    12.1   |
+|    19.7      |    14.1   |
+|    17.2      |    16.5   |
+|    29.5      |    32     |
+|    31.1      |    27     |
+|    20.2      |    17.5   |
+|    48.5      |    45.8   |
+|    22.8      |    25.4   |
+|    33.8      |    37.5   |
 
 #### Overall model performance is decent, but could use further optimizing.
 
-#### Model is better at predicting motor score than total score with the given features.
+#### Model is slightly better at predicting motor score than total score with the given features.
 
 
 
