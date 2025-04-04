@@ -34,7 +34,7 @@ https://archive.ics.uci.edu/dataset/189/parkinsons+telemonitoring
 **Distribution of Patient UPDRS Scores:** <br><br>
 
 <!-- Insert score distribution plots here -->
-<img src="https://github.com/kpannoni/ml-capstone/blob/main/dist_motor_score.png" alt="histogram of motor UPDRS score" width="350"/> &emsp;&emsp; <img src="https://github.com/kpannoni/ml-capstone/blob/main/dist_total_score.png" alt="histogram of total UPDRS score" width="350"/>
+<img src="https://github.com/kpannoni/ml-capstone/blob/main/dist_motor_score.png" alt="histogram of motor UPDRS score" width="400"/> &emsp;&emsp; <img src="https://github.com/kpannoni/ml-capstone/blob/main/dist_total_score.png" alt="histogram of total UPDRS score" width="400"/>
 
 ## Goal
 
@@ -96,8 +96,8 @@ _Calculated the Root Mean Squared Error and normalized to the range of scores in
  - 10.7% for Total Score
 
 ### Model Predictions
-<br>
-<img src="https://github.com/kpannoni/ml-capstone/blob/main/Predicted_vs_actual_motor_UPDRS.png" alt="Predicted Scores Motor UPDRS" width="300"/> &emsp;&emsp;<img src="https://github.com/kpannoni/ml-capstone/blob/main/Predicted_vs_actual_total_UPDRS.png" alt="Predicted Scores Motor UPDRS" width="300"/>
+
+<img src="https://github.com/kpannoni/ml-capstone/blob/main/Predicted_vs_actual_motor_UPDRS.png" alt="Predicted Scores Motor UPDRS" width="300"/> &emsp;&emsp; <img src="https://github.com/kpannoni/ml-capstone/blob/main/Predicted_vs_actual_total_UPDRS.png" alt="Predicted Scores Motor UPDRS" width="300"/>
 
 ### Motor Score Model Predictions (first 10):
 | Actual Score | Predicted |
