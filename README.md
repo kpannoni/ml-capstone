@@ -34,7 +34,7 @@ https://archive.ics.uci.edu/dataset/189/parkinsons+telemonitoring
 **Distribution of Patient UPDRS Scores:** <br><br>
 
 <!-- Insert score distribution plots here -->
-<img src="https://github.com/kpannoni/ml-capstone/blob/main/dist_motor_score.png" alt="histogram of motor UPDRS score" width="400"/> &emsp;&emsp; <img src="https://github.com/kpannoni/ml-capstone/blob/main/dist_total_score.png" alt="histogram of total UPDRS score" width="400"/>
+<img src="https://github.com/kpannoni/ml-capstone/blob/main/dist_motor_score.png" alt="histogram of motor UPDRS score" width="400"/> &emsp; <img src="https://github.com/kpannoni/ml-capstone/blob/main/dist_total_score.png" alt="histogram of total UPDRS score" width="400"/>
 
 ## Goal
 
