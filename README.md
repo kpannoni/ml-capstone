@@ -14,7 +14,7 @@ https://archive.ics.uci.edu/dataset/189/parkinsons+telemonitoring
 
 
 <!-- Insert demographics of age and sex here -->
-<img src="https://github.com/kpannoni/ml-capstone/blob/main/piechart_sex.png" alt="Pie chart of patient sex" width="200"/> &emsp;&emsp; <img src="https://github.com/kpannoni/ml-capstone/blob/main/age_boxplot_updated.png" alt="Box plot of patient age" width="400"/>
+<img src="https://github.com/kpannoni/ml-capstone/blob/main/piechart_sex.png" alt="Pie chart of patient sex" width="200"/> &emsp;&emsp; <img src="https://github.com/kpannoni/ml-capstone/blob/main/age_boxplot.png" alt="Box plot of patient age" width="400"/>
 <!--
 ![Pie chart of patient sex](/age_boxplot_updated.png) -->
   
@@ -34,7 +34,7 @@ https://archive.ics.uci.edu/dataset/189/parkinsons+telemonitoring
 **Distribution of Patient UPDRS Scores:** <br><br>
 
 <!-- Insert score distribution plots here -->
-<img src="https://github.com/kpannoni/ml-capstone/blob/main/dist_motor_score.png" alt="histogram of motor UPDRS score" width="350"/> &emsp; <img src="https://github.com/kpannoni/ml-capstone/blob/main/dist_total_score.png" alt="histogram of total UPDRS score" width="350"/>
+<img src="https://github.com/kpannoni/ml-capstone/blob/main/Motor Score_distribution.png" alt="histogram of motor UPDRS score" width="400"/> &emsp; <img src="https://github.com/kpannoni/ml-capstone/blob/main/Total Score_distribution.png" alt="histogram of total UPDRS score" width="400"/>
 
 ## Goal
 
@@ -81,19 +81,19 @@ Model was trained on 19 features to predict 2 targets.
 
 **Assessing model performance with Mean Squared Error:**
 
-Combined model loss (MSE):  **40.8**
+Combined model loss (MSE):  **42.1**
 
 ### Metrics for Model Evaluation
 | Target        | Loss |  RMSE  | Norm RMSE   |
 | ------------- |:----:|:------:|:-----------:|
-| Motor Score   | 14.5 |  3.8   |   0.110     |
-| Total Score   | 26.3 |  5.1   |   0.107     |
+| Motor Score   | 15.2 |  3.9   |   0.113     |
+| Total Score   | 27.0 |  5.2   |   0.108     |
 
 _Calculated the Root Mean Squared Error and normalized to the range of scores in the dataset for each target._
 
 **Percent Error of the model:**
- - 11% for Motor Score
- - 10.7% for Total Score
+ - 11.3% for Motor Score
+ - 10.8% for Total Score
 
 ### Model Predictions
 
@@ -102,34 +102,34 @@ _Calculated the Root Mean Squared Error and normalized to the range of scores in
 ### Motor Score Model Predictions (first 10):
 | Actual Score | Predicted |
 | :----------: |:---------:|
-|    25.6      |    33.1   |
+|    21.7      |    33.1   |
 |     5.9      |    7.2    |
-|    14.4      |    11.2   |
-|    12.5      |    12.8   |
-|    23.2      |    25.4   |
-|    22.7      |    19     |
-|    31        |    25.2   |
-|    14.9      |    17.9   |
-|    24.7      |    28.1   |
-|    15        |    16.1   |
+|    15.9      |    11.2   |
+|    16.0      |    12.8   |
+|    21.9      |    25.4   |
+|    17.1      |    18     |
+|    13.5      |    11.5   |
+|    28.6      |    25.2   |
+|    11.7      |    17.9   |
+|    25.3      |    28.1   |
 
 ### Total Score Model Predictions (first 10):
 | Actual Score | Predicted |
 | :----------: |:---------:|
-|    34.5      |    43.7   |
-|    9.6       |    12.1   |
-|    19.7      |    14.1   |
-|    17.2      |    16.5   |
-|    29.5      |    32     |
-|    31.1      |    27     |
-|    20.2      |    17.5   |
-|    48.5      |    45.8   |
-|    22.8      |    25.4   |
-|    33.8      |    37.5   |
+|    31.1      |    43.6   |
+|    10.2      |    12.1   |
+|    20.1      |    14.1   |
+|    20.5      |    16.5   |
+|    28.6      |    32     |
+|    24.4      |    27     |
+|    20.1      |    17.5   |
+|    46.1      |    45.8   |
+|    18.9      |    25.4   |
+|    33.9      |    37.5   |
 
 #### Overall model performance is decent, but could use further optimizing.
 
-#### Model is slightly better at predicting motor score than total score with the given features.
+#### Model is slightly better at predicting motor score than total score with the given features; however, when you normalize by the possible range of the scores, they have a similar % error.
 
 
 
