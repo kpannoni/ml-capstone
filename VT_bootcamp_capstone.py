@@ -39,6 +39,12 @@ from tensorflow.keras import regularizers
 layers = tf.keras.layers
 import warnings
 warnings.filterwarnings("ignore")
+import inspect
+import contextlib
+from datetime import date
+import time
+import os
+import sys
 from ucimlrepo import fetch_ucirepo 
   
 print("\nFetching the data...\n")
@@ -73,7 +79,8 @@ fig, axes = plt.subplots()
 age_boxplot = sns.boxplot(x='age', data=X, color=sns.color_palette('pastel')[2], linecolor="0.3", linewidth=3)
 age_boxplot.set(title='Patient Age', xlabel = "Years")
 plt.tick_params(labelsize=16)
-plt.xticks(np.arange(30,95,5));
+plt.xticks(np.arange(30,95,5))
+plt.savefig('age_boxplot.png', dpi=300, bbox_inches='tight')
 
 # how many males and females?
 sex_count = X["sex"].value_counts()
@@ -84,16 +91,17 @@ print("\nSex Distribution:\n", sex_count[0], " males\n", sex_count[1], " females
 labels = ["Males","Females"]
 colors_sex = [sns.color_palette('pastel')[0],sns.color_palette('pastel')[3]]
 # Create a pie chart to visualize percentage of sex
-# sns.set(rc={'figure.figsize':(3,3)})
+sns.set(rc={'figure.figsize':(3,3)})
 fig, ax = plt.subplots()
+fig.tight_layout(pad=5)
 plt.pie(x = sex_count, labels = labels, autopct='%1.0f%%', colors=colors_sex, textprops={'size': 'xx-large', 'weight':"bold"}, radius=2.5)
+plt.savefig('piechart_sex.png', dpi=300, bbox_inches='tight')
 
 print("\nUnified Parkinson's Disease Rating Scores\n")
 
 # Take a look at the UPDRS score distributions
 sns.set(rc={'figure.figsize':(8,4)})
 fig, axes = plt.subplots(2,1)
-fig.tight_layout()
 plt.subplots_adjust(wspace=0.6, hspace=0.6)
 motor = sns.boxplot(x='motor_UPDRS', data=y, color=sns.color_palette('pastel')[3], ax = axes[0],linecolor="0.3", linewidth=3)
 total = sns.boxplot(x='total_UPDRS', data=y, color=sns.color_palette('pastel')[4], ax = axes[1], linecolor="0.3", linewidth=3)
@@ -102,6 +110,7 @@ motor.set(title='UPDRS Motor Score', xlabel = None, xlim=(0,108))
 total.set(title='UPDRS Total Score', xlabel = None, xlim=(0,176))
 axes[0].tick_params(labelsize=14)
 axes[1].tick_params(labelsize=14)
+plt.savefig('UPDRS_boxplots.png', dpi=300, bbox_inches='tight')
 
 # Create a function for distribution plot that can be used to look at the distribution of any of the metrics
 
@@ -113,9 +122,9 @@ range_total = [0, 20,40,60,80,100,120, 140, 160, 179]
 range_motor = [0, 20,40,60,80,100,108]
 
 def dist_plot(x, label, bins, color, x_range): 
-    fig, ax = plt.subplots(figsize=(10, 5))
     plt.style.use('fivethirtyeight')
     sns.set_style("whitegrid")
+    fig, ax = plt.subplots(figsize=(10, 5))
     # Create the plot
     sns.distplot(x, bins=bins, color=color)
     title = "Distribution of " + label # set plot title
@@ -125,6 +134,7 @@ def dist_plot(x, label, bins, color, x_range):
     plt.ylabel('Frequency', fontdict={'fontname': 'Monospace', 'fontsize': 24, 'fontweight':'bold'})
     plt.tick_params(labelsize=22)
     ax.set_xticks(x_range) 
+    plt.savefig(f'{label}_distribution.png', dpi=300, bbox_inches='tight')
     plt.show()
     
 # Create a dist plot for motor score and total score
@@ -145,14 +155,30 @@ corr_df = pd.concat([corr_df, y], axis=1) # add targets back for this because we
 
 # Function to create the correlation matrix
 def compute_corr(df):
-    corr = df.corr()
+    corr = round(df.corr(),2)
     mask = np.zeros_like(corr)
     mask[np.triu_indices_from(mask)] = True
     with sns.axes_style("white"): # set seaborn style
-        f, ax = plt.subplots(figsize=(16, 5))
+        f, ax = plt.subplots(figsize=(14, 7))
+        plt.title("Feature Correlation Matrix", fontsize=24, fontweight="bold", y=0.9)
         sns.heatmap(corr, mask=mask, vmax=1.0, vmin=-1.0, square=False, annot=True, cmap='coolwarm')
-    plt.savefig('corr.png')
-    plt.show()
+        cbar = ax.collections[0].colorbar
+        cbar.ax.tick_params(labelsize=15)
+        # Get current tick positions and labels
+        xticks = ax.get_xticks()
+        xticklabels = [label.get_text() for label in ax.get_xticklabels()]
+        yticks = ax.get_yticks()
+        yticklabels = [label.get_text() for label in ax.get_yticklabels()]
+
+        # Remove the last label which is just total score correlated with itself
+        ax.set_xticks(xticks[:-1])
+        ax.set_xticklabels(xticklabels[:-1])
+        # remove the first y label which is age correlated with itself
+        ax.set_yticks(yticks[1:])
+        ax.set_yticklabels(yticklabels[1:])
+        ax.tick_params(axis='both', labelsize=14)
+        plt.savefig('feature_correlation_plot.png', dpi=300, bbox_inches='tight')
+        plt.show()
     
 # Use the compute_corr() function on the correlation dataframe
 compute_corr(corr_df)
@@ -179,7 +205,8 @@ X_train, X_test, y1_train, y1_test, y2_train, y2_test = train_test_split(
     scaled_X, y1, y2, test_size=test_split, random_state=42 )
 
 # Check the shape of the train and test datasets
-print(f"Training-Test Split {round((1-test_split)*100)}:{round(test_split*100)}")
+split = f"{round((1-test_split)*100)}:{round(test_split*100)}"
+print(f"Training-Test Split {split}")
 print("Training dataset:", X_train.shape)
 print("Test dataset:", X_test.shape)
 
@@ -223,12 +250,30 @@ epochs = 30
 # Define the batch size
 batch = 32
 
+# Save the model architecture summary
+with open('model_architecture.txt', 'w') as f:
+    with contextlib.redirect_stdout(f):
+        model.summary()
+
 print(f"\nTraining the model with {epochs} epochs and a batch size of {batch}...\n")
+
+# Record start time
+start_time = time.time()
 
 # Fit the model with the training data for motor score and total score
 history = model.fit(X_train, {'out1': y1_train, 'out2': y2_train}, epochs=epochs, batch_size=batch, callbacks=[callback], validation_data=(X_test, {'out1': y1_test, 'out2': y2_test}))
 
+# Save the history for later, in case we need it
+model_history = pd.DataFrame(history.history)
+model_history.to_csv("training_history.csv")
+
 print("\n...done.")
+
+# Save the full model, so we can use it later without having to rerun the whole thing
+model.save('fulL_model.h5')
+
+end_time = time.time()
+runtime = round(end_time - start_time, 2)
 
 #%%% Evaluate the model's performance
 
@@ -243,7 +288,7 @@ plt.xlabel('epoch')
 plt.legend(['train', 'test'], loc='upper right')
 plt.xlim(0,epochs-1)
 plt.xticks(np.arange(0,epochs-1,1))
-plt.savefig("train_val_loss_curves.png")
+plt.savefig("train_val_loss_curves.png", dpi=300, bbox_inches='tight')
 plt.show()
 
 print("Let's evaluate the model on the test dataset!\n")
@@ -275,8 +320,8 @@ norm_RMSE_motor = round(motor_RMSE / range_motor, 3)
 norm_RMSE_total = round(total_RMSE / range_total, 3)
 
 # Get the error as a percent of the range (norm RMSE as %)
-motor_percent_error = norm_RMSE_motor * 100
-total_percent_error = norm_RMSE_total * 100
+motor_percent_error = round(norm_RMSE_motor * 100, 1)
+total_percent_error = round(norm_RMSE_total * 100, 1)
 
 # Create a summary dataframe with the results
 
@@ -318,7 +363,7 @@ print("\nPlotting the actual scores vs predicted scores...")
 # Function to plot the actual values vs the predicted values for both targets
 def predictions_plot(predict, actual, color, label, max_score): 
     fig, ax = plt.subplots(figsize=(8, 8))
-    fig.tight_layout(pad=8)
+    fig.tight_layout(pad=5)
     # Create the plot
     sns.scatterplot(x=actual, y=predict, color = color)
     title = "Predicted vs Actual " + label    # set plot title
@@ -352,6 +397,30 @@ print("\nFirst 10 predictions:")
 # Print the first 10 predictions to the console
 print("\nMotor Score:\n", predict_motor_df[0:9])
 print("\nTotal Score:\n", predict_total_df[0:9])
+
+#%% Saving metadata as a .txt file
+
+code_name = "VT_bootcamp_capstone.py"
+
+# Get some metadata about the model
+model_type = "Functional API"
+optimizer = model.optimizer.__class__.__name__
+loss = f"\n  Motor Score: {model.loss['out1']}\n  Total Score: {model.loss['out2']}"
+dense_layers = 3
+targets = ", ".join(y.columns)
+var_list = ", ".join(X.columns)
+num_variables = len(X.columns)
+regularization = f"L2 regularization, Lambda = {l2_lambda}"
+
+
+# Put the summary metadata together
+model_summary = {"Date": date.today().isoformat(), "Code": code_name, "Data Source": "https://archive.ics.uci.edu/dataset/189/parkinsons+telemonitoring", "Number of Variables": num_variables, "Variables Included": var_list, "Targets":targets, "\nModel":model_type, "Layers": f"{dense_layers} dense layers", "Regularization": regularization, "Optimizer": optimizer, "Loss": loss, "\nTrain-Test Split": split, "Train Time": f"{runtime} sec" , "Epochs": epochs, "Batch Size": batch, "\nResults": val_results_df}
+
+# write the metadata dictionary to a text file
+meta_file = open('model_summary.txt', 'wt')
+for line in model_summary:
+    meta_file.write(str(line) + ": " + str(model_summary[line]) + "\n")
+meta_file.close()
 
 print("\nCode is complete!")
 

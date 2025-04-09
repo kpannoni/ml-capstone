@@ -1,0 +1,24 @@
+Date: 2025-04-09
+Code: VT_bootcamp_capstone.py
+Data Source: https://archive.ics.uci.edu/dataset/189/parkinsons+telemonitoring
+Number of Variables: 19
+Variables Included: age, test_time, Jitter(%), Jitter(Abs), Jitter:RAP, Jitter:PPQ5, Jitter:DDP, Shimmer, Shimmer(dB), Shimmer:APQ3, Shimmer:APQ5, Shimmer:APQ11, Shimmer:DDA, NHR, HNR, RPDE, DFA, PPE, sex
+Targets: motor_UPDRS, total_UPDRS
+
+Model: Functional API
+Layers: 3 dense layers
+Regularization: L2 regularization, Lambda = 0.0001
+Optimizer: Adam
+Loss: 
+  Motor Score: mean_squared_error
+  Total Score: mean_squared_error
+
+Train-Test Split: 80:20
+Train Time: 9.3 sec
+Epochs: 30
+Batch Size: 32
+
+Results:                          Motor Score  Total Score
+Mean Squared Error             15.21        26.96
+Root Mean Squared Error         3.90         5.19
+% error (of the range)         11.30        10.80
